@@ -328,44 +328,41 @@ var d= function(doh) {
 				or.apply(doh,arguments);
 			}
 		})(doh._report);
-		
+
+        function formatArgs(args) {
+            var msg, len, i;
+            msg = '';
+            len = args.length;
+            i = 0;
+
+            for(; i<len; i++) {
+                msg += ' ' + args[i];
+            }
+
+            return msg;
+        }
+
 		doh.error = undefined;
 		if(this["opera"] && opera.postError){
 			doh.debug = function(){
-				var msg = "";
-				for(var x=0; x<arguments.length; x++){
-					msg += " "+arguments[x];
-				}
+				var msg = formatArgs(arguments);
 				sendToLogPane([msg]);
 				opera.postError("DEBUG:"+msg);
 			}
 		}else if(window["console"]){
 			if(console.error){
 				doh.error = function(){
+                    var msg = formatArgs(arguments);
 					sendToLogPane.call(window, arguments);
-					console.error.apply(console, arguments);
+					console.error('ERROR:' + msg);
 				};
 			}
-			if(console.debug){
-				doh.debug = function(){
-					sendToLogPane.call(window, arguments);
-					console.debug.apply(console, arguments);
-				};
-			}else if(console.info){
-				doh.debug = function(){
-					sendToLogPane.call(window, arguments);
-					console.info.apply(console, arguments);
-				};
-			}else{
-				doh.debug = function(){
-					var msg = "";
-					for(var x=0; x<arguments.length; x++){
-						msg += " "+arguments[x];
-					}
-					sendToLogPane([msg]);
-					console.log("DEBUG:"+msg);
-				};
-			}
+
+            doh.debug = function(){
+                var msg = formatArgs(arguments);
+                sendToLogPane([msg]);
+                console.log("DEBUG:"+msg);
+            };
 		}else{
 			doh.debug = function(){
 				sendToLogPane.call(window, arguments);
